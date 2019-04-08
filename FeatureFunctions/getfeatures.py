@@ -2,7 +2,26 @@ import pandas as pd
 from FeatureFunctions import helper
 import string
 from sklearn.feature_extraction.text import CountVectorizer
+from afinn import Afinn
+import numpy as np
 
+def getaffinfeats(tweets):
+    afinn = Afinn()
+    overall_score = tweets.apply(afinn.score)
+    trainingdata_bags = helper.allbags(tweets)
+    training_wordlength = [len(item) for item in trainingdata_bags]
+
+    seperate_scores = []
+    for i in range(len(tweets)):
+        seperate_scores.append([afinn.score(word) for word in trainingdata_bags[i]])
+
+    positive_words = [sum([1 for i in row if i > 0]) for row in seperate_scores]
+    negative_words = [sum([1 for i in row if i < 0]) for row in seperate_scores]
+    neutral_words = [sum([1 for i in row if i == 0]) for row in seperate_scores]
+    difference_maxmin = [max(row) - min(row) for row in seperate_scores]
+    polarity_contrast = [a*b>0 for a,b in zip(negative_words,positive_words)]
+    afinn_features = np.column_stack((positive_words, negative_words, neutral_words, overall_score, difference_maxmin, polarity_contrast))
+    return afinn_features
 
 def getlexical(train_data, tweet_column, unicount_vect=None, bicount_vect=None, tricount_vect=None, fourcount_vect=None):
     train_tweets = train_data[tweet_column]
