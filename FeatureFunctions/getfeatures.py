@@ -4,7 +4,7 @@ import string
 from sklearn.feature_extraction.text import CountVectorizer
 
 
-def getlexical(train_data, tweet_column):
+def getlexical(train_data, tweet_column, unicount_vect=None, bicount_vect=None, tricount_vect=None, fourcount_vect=None):
     train_tweets = train_data[tweet_column]
     ##### Generate training features
     ### Getting all word bags
@@ -49,22 +49,43 @@ def getlexical(train_data, tweet_column):
     trainingdata["EmojiCount"] = helper.emojifeats(Bags)
 
     ### Create feature vectors for *gram features
-
-    count_vect = CountVectorizer(
-        analyzer=lambda x:x
-    )
+    if unicount_vect==None:
+        unicount_vect = CountVectorizer(
+            analyzer=lambda x:x
+        )
+        UnigramVector = unicount_vect.fit_transform(Bags)
+    else:
+        UnigramVector = unicount_vect.transform(Bags)
 
     ### Getting all bigrams
     Bigrams = helper.bigrams(Bags)
+    if bicount_vect==None:
+        bicount_vect = CountVectorizer(
+            analyzer=lambda x:x
+        )
+        BigramVector = bicount_vect.fit_transform(Bigrams)
+    else:
+        BigramVector = bicount_vect.transform(Bigrams)
 
     ### Getting Character tri- and fourgrams
     CharTrigram = helper.chartrigrams(Bags)
-    CharFourgram = helper.charfourgrams(Bags)
+    if tricount_vect==None:
+        tricount_vect = CountVectorizer(
+            analyzer=lambda x:x
+        )
+        CharTrigramVector = tricount_vect.fit_transform(CharTrigram)
+    else:
+        CharTrigramVector = tricount_vect.transform(CharTrigram)
 
-    BigramVector = count_vect.fit_transform(Bigrams)
-    UnigramVector = count_vect.fit_transform(Bags)
-    CharTrigramVector = count_vect.fit_transform(CharTrigram)
-    CharFourgramVector = count_vect.fit_transform(CharFourgram)
+    CharFourgram = helper.charfourgrams(Bags)
+    if fourcount_vect==None:
+        fourcount_vect = CountVectorizer(
+            analyzer=lambda x:x
+        )
+        CharFourgramVector = fourcount_vect.fit_transform(CharFourgram)
+    else:
+        CharFourgramVector = fourcount_vect.transform(CharFourgram)
+
 
     ### Voeg de vectors toe aan DataFrame
 
@@ -72,4 +93,4 @@ def getlexical(train_data, tweet_column):
     trainingdata['UnigramVector'] = UnigramVector.toarray().tolist()
     trainingdata['CharTrigramVector'] = CharTrigramVector.toarray().tolist()
     trainingdata['CharFourgramVector'] = CharFourgramVector.toarray().tolist()
-    return trainingdata
+    return trainingdata, unicount_vect, bicount_vect, tricount_vect, fourcount_vect
