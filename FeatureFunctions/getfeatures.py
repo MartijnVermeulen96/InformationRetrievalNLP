@@ -4,7 +4,7 @@ import string
 from sklearn.feature_extraction.text import CountVectorizer
 
 
-def get(train_data, tweet_column):
+def getlexical(train_data, tweet_column):
     train_tweets = train_data[tweet_column]
     ##### Generate training features
     ### Getting all word bags
