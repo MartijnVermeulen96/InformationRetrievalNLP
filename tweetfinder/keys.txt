@@ -1,0 +1,5 @@
+type, value
+(API key),927IE1jQECrBvRhT0Qw3pEs01
+(API secret key),c7ntcL8E2L6URmyLO3ESt3cdte1421LLapu2XdWI2l7CvxvT4X
+(Access token), 1072115200126521349-53MV7gqlnxhyDOyZdcOKVS8R079MjA
+(Access token secret), nAo4BModfk0okDHBtAVg9oxDGRG9c76iVxPi6CHNPy4N9
