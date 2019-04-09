@@ -2,6 +2,8 @@ import pandas as pd
 from FeatureFunctions import helper
 import string
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+
 from afinn import Afinn
 import numpy as np
 
@@ -18,7 +20,8 @@ def getaffinfeats(tweets):
     positive_words = [sum([1 for i in row if i > 0]) for row in seperate_scores]
     negative_words = [sum([1 for i in row if i < 0]) for row in seperate_scores]
     neutral_words = [sum([1 for i in row if i == 0]) for row in seperate_scores]
-    difference_maxmin = [max(row) - min(row) for row in seperate_scores]
+
+    difference_maxmin = [max(row) - min(row) if len(row) > 0 else 0 for row in seperate_scores]
     polarity_contrast = [a*b>0 for a,b in zip(negative_words,positive_words)]
     afinn_features = np.column_stack((positive_words, negative_words, neutral_words, overall_score, difference_maxmin, polarity_contrast))
     return afinn_features
@@ -69,7 +72,7 @@ def getlexical(train_data, tweet_column, unicount_vect=None, bicount_vect=None, 
 
     ### Create feature vectors for *gram features
     if unicount_vect==None:
-        unicount_vect = CountVectorizer(
+        unicount_vect = CountVectorizer(strip_accents="unicode", stop_words="english",
             analyzer=lambda x:x
         )
         UnigramVector = unicount_vect.fit_transform(Bags)
@@ -79,7 +82,7 @@ def getlexical(train_data, tweet_column, unicount_vect=None, bicount_vect=None, 
     ### Getting all bigrams
     Bigrams = helper.bigrams(Bags)
     if bicount_vect==None:
-        bicount_vect = CountVectorizer(
+        bicount_vect = CountVectorizer(strip_accents="unicode", stop_words="english",
             analyzer=lambda x:x
         )
         BigramVector = bicount_vect.fit_transform(Bigrams)
@@ -89,7 +92,7 @@ def getlexical(train_data, tweet_column, unicount_vect=None, bicount_vect=None, 
     ### Getting Character tri- and fourgrams
     CharTrigram = helper.chartrigrams(Bags)
     if tricount_vect==None:
-        tricount_vect = CountVectorizer(
+        tricount_vect = CountVectorizer(strip_accents="unicode", stop_words="english",
             analyzer=lambda x:x
         )
         CharTrigramVector = tricount_vect.fit_transform(CharTrigram)
@@ -98,7 +101,7 @@ def getlexical(train_data, tweet_column, unicount_vect=None, bicount_vect=None, 
 
     CharFourgram = helper.charfourgrams(Bags)
     if fourcount_vect==None:
-        fourcount_vect = CountVectorizer(
+        fourcount_vect = CountVectorizer(strip_accents="unicode", stop_words="english",
             analyzer=lambda x:x
         )
         CharFourgramVector = fourcount_vect.fit_transform(CharFourgram)

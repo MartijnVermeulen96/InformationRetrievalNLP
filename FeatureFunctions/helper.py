@@ -1,16 +1,15 @@
-import twokenize
 from nltk import ngrams
 from itertools import groupby
 import string
 from emoji import UNICODE_EMOJI
+from nltk.tokenize import TweetTokenizer
 
 def allbags(tweets):
   allbags = []
   for i in range(len(tweets)):
-    bagofwords = twokenize.simpleTokenize(tweets.iloc[i].lower())
-    allbags.append(bagofwords)
+      bagofwords = TweetTokenizer(preserve_case=False, reduce_len=True, strip_handles=True).tokenize(tweets[i])
+      allbags.append(bagofwords)
   return allbags
-
 
 def bigrams(bags):
     allbigrams = []
@@ -114,3 +113,54 @@ def emojifeats(bags):
                 emojicount += 1;
         emojifeature.append(emojicount)
     return emojifeature
+
+
+def calc_accuracy(true, predicted):
+    """Calculates the accuracy of a (multiclass) classifier, defined as the fraction of correct classifications."""
+    return sum([t==p for t,p in zip(true, predicted)]) / float(len(true))
+
+def precision_recall_fscore(true, predicted, beta=1, labels=None, pos_label=None, average=None):
+    """Calculates the precision, recall and F-score of a classifier.
+    :param true: iterable of the true class labels
+    :param predicted: iterable of the predicted labels
+    :param beta: the beta value for F-score calculation
+    :param labels: iterable containing the possible class labels
+    :param pos_label: the positive label (i.e. 1 label for binary classification)
+    :param average: selects weighted, micro- or macro-averaged F-score
+    """
+
+    # Build contingency table as ldict
+    ldict = {}
+    for l in labels:
+        ldict[l] = {"tp": 0., "fp": 0., "fn": 0., "support": 0.}
+
+    for t, p in zip(true, predicted):
+        if t == p:
+            ldict[t]["tp"] += 1
+        else:
+            ldict[t]["fn"] += 1
+            ldict[p]["fp"] += 1
+        ldict[t]["support"] += 1
+
+    # Calculate precision, recall and F-beta score per class
+    beta2 = beta ** 2
+    for l, d in ldict.items():
+        try:
+            ldict[l]["precision"] = d["tp"]/(d["tp"] + d["fp"])
+        except ZeroDivisionError: ldict[l]["precision"] = 0.0
+        try: ldict[l]["recall"]    = d["tp"]/(d["tp"] + d["fn"])
+        except ZeroDivisionError: ldict[l]["recall"]    = 0.0
+        try: ldict[l]["fscore"] = (1 + beta2) * (ldict[l]["precision"] * ldict[l]["recall"]) / (beta2 * ldict[l]["precision"] + ldict[l]["recall"])
+        except ZeroDivisionError: ldict[l]["fscore"] = 0.0
+
+    # If there is only 1 label of interest, return the scores. No averaging needs to be done.
+    if pos_label:
+        d = ldict[pos_label]
+        return (d["precision"], d["recall"], d["fscore"])
+    # If there are multiple labels of interest, macro-average scores.
+    else:
+        for label in ldict.keys():
+            avg_precision = sum(l["precision"] for l in ldict.values()) / len(ldict)
+            avg_recall = sum(l["recall"] for l in ldict.values()) / len(ldict)
+            avg_fscore = sum(l["fscore"] for l in ldict.values()) / len(ldict)
+        return (avg_precision, avg_recall, avg_fscore)
