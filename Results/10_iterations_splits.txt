@@ -1,0 +1,13 @@
+BoW results with 10 iterations: 
+61.71±2.84	62.90±3.38	57.17±5.46	59.86±3.61	
+
+Lexical results with 10 iterations: 
+69.79±2.37	69.34±2.30	70.97±4.47	70.13±2.79	
+
+Semantic results with 10 iterations: 
+58.29±2.48	60.19±3.19	49.06±4.12	54.03±3.19	
+
+Combined results with 10 iterations: 
+71.71±4.15	72.48±3.74	69.97±7.68	71.16±5.11	
+
+Accuracy, Precision, Recall, F1-score
