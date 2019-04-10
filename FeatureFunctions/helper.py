@@ -6,6 +6,33 @@ from nltk.tokenize import TweetTokenizer
 import numpy as np
 from gensim.models import Word2Vec
 
+def getindices(trainingdata, train_split=9, test_split=1):
+    ### Creating 50-50% balance
+    ## Train
+
+    ### Count the amount of samples
+    amount_nonirony_train = sum(trainingdata["Label"] == 0)
+    amount_irony_train = sum(trainingdata["Label"] > 0)
+    amount_train_amount = min(amount_nonirony_train, amount_irony_train)
+
+
+
+    ### Sample indices
+    nonirony_index = trainingdata[trainingdata["Label"] == 0].index.to_series()
+    irony_index = trainingdata[trainingdata["Label"] > 0].index.to_series()
+
+    total_nonirony_samples = nonirony_index.sample(amount_train_amount).tolist()
+    total_irony_samples = irony_index.sample(amount_train_amount).tolist()
+
+    train_amount = round(amount_train_amount / (train_split + test_split) * train_split)
+    test_amount = round(amount_train_amount / (train_split + test_split) * test_split)    
+
+    resulting_train_index = total_nonirony_samples[:train_amount] + total_irony_samples[:train_amount]
+    resulting_test_index = total_nonirony_samples[train_amount+1:] + total_irony_samples[train_amount+1:]
+
+    return resulting_train_index, resulting_test_index
+
+
 ### Bags as input
 def onehotwordclusters(bags, kmeansmodel, w2vmodel):
     vocab = w2vmodel.wv.index2word
