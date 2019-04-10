@@ -4,3 +4,4 @@ BoW results with 50 iterations:
 Lexical results with 50 iterations: 
 70.11 ±2.64 -67.59 +73.36	68.92 ±2.52 -66.59 +72.82	73.28 ±4.98 -65.35 +77.69	71.01 ±3.01 -66.85 +73.74	
 
+

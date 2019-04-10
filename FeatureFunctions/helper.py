@@ -3,6 +3,30 @@ from itertools import groupby
 import string
 from emoji import UNICODE_EMOJI
 from nltk.tokenize import TweetTokenizer
+import numpy as np
+from gensim.models import Word2Vec
+
+### Bags as input
+def onehotwordclusters(bags, kmeansmodel, w2vmodel):
+    vocab = w2vmodel.wv.index2word
+
+    resulting_clusters = []
+
+    for row in bags:
+        filtered_words = list(filter(lambda x: x in vocab, row))
+        if len(filtered_words)>0:
+            result = list(kmeansmodel.predict(w2vmodel.wv[filtered_words]))
+        else:
+            result = []
+        resulting_clusters.append(result)
+
+    onehotvec = np.zeros((len(resulting_clusters), 2000))
+    for i in range(len(resulting_clusters)):
+        onehotvec[i, resulting_clusters[i]] = 1
+
+    return onehotvec
+
+
 
 def allbags(tweets):
   allbags = []
