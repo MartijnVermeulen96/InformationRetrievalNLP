@@ -5,6 +5,7 @@ from emoji import UNICODE_EMOJI
 from nltk.tokenize import TweetTokenizer
 import numpy as np
 from gensim.models import Word2Vec
+import twokenize
 
 def getindices(trainingdata, train_split=9, test_split=1):
     ### Creating 50-50% balance
@@ -25,7 +26,7 @@ def getindices(trainingdata, train_split=9, test_split=1):
     total_irony_samples = irony_index.sample(amount_train_amount).tolist()
 
     train_amount = round(amount_train_amount / (train_split + test_split) * train_split)
-    test_amount = round(amount_train_amount / (train_split + test_split) * test_split)    
+    test_amount = round(amount_train_amount / (train_split + test_split) * test_split)
 
     resulting_train_index = total_nonirony_samples[:train_amount] + total_irony_samples[:train_amount]
     resulting_test_index = total_nonirony_samples[train_amount+1:] + total_irony_samples[train_amount+1:]
@@ -58,7 +59,7 @@ def onehotwordclusters(bags, kmeansmodel, w2vmodel):
 def allbags(tweets):
   allbags = []
   for i in range(len(tweets)):
-      bagofwords = TweetTokenizer(preserve_case=False, reduce_len=True, strip_handles=True).tokenize(tweets[i])
+      bagofwords = twokenize.simpleTokenize(tweets[i])
       allbags.append(bagofwords)
   return allbags
 
