@@ -25,7 +25,7 @@ def getPOSfeatures(inputfile):
                 result_line.append(word[1])
                 allvalues += word[1]
 
-    columns_base = ['#', 'O', '^', '$', 'S', 'G', 'P', ',', 'E', 'L', 'V', 'A', 'T', 'Z', 'X', '~', 'D', '!', 'R', '&', 'Y', 'U', 'N']
+    columns_base = ['@','#', 'O', '^', '$', 'S', 'G', 'P', ',', 'E', 'L', 'V', 'A', 'T', 'Z', 'X', '~', 'D', '!', 'R', '&', 'Y', 'U', 'N']
     columns_binary = ["occurs_" + s for s in columns_base]
     columns_012 = ["012_" + s for s in columns_base]
     columns_percentage = ["perc_" + s for s in columns_base]
