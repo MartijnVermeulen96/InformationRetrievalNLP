@@ -6,6 +6,43 @@ from nltk.tokenize import TweetTokenizer
 import numpy as np
 from gensim.models import Word2Vec
 import twokenize
+import pandas as pd
+
+def getPOSfeatures(inputfile):
+    with open(inputfile) as f:
+        allvalues = ''
+        lis = [line.split() for line in f]        # create a list of lists
+        irow = 0
+        train_results = []
+        result_line = []
+
+        for word in lis:
+            if len(word) < 3:
+                irow = irow + 1
+                train_results.append(result_line)
+                result_line = []
+            else:
+                result_line.append(word[1])
+                allvalues += word[1]
+
+    columns_base = ['#', 'O', '^', '$', 'S', 'G', 'P', ',', 'E', 'L', 'V', 'A', 'T', 'Z', 'X', '~', 'D', '!', 'R', '&', 'Y', 'U', 'N']
+    columns_binary = ["occurs_" + s for s in columns_base]
+    columns_012 = ["012_" + s for s in columns_base]
+    columns_percentage = ["perc_" + s for s in columns_base]
+    columns = columns_base + columns_binary + columns_012 + columns_percentage
+
+    train_df = pd.DataFrame(0,columns=columns, index=np.arange(len(train_results)))
+
+    for i in range(len(train_results)):
+        for word_pos in train_results[i]:
+            train_df.loc[i, word_pos] = train_df.loc[i, word_pos] + 1
+    train_df[columns_012] = train_df[columns_base].applymap(lambda x: min(x,2))
+    train_df[columns_binary] = train_df[columns_base].applymap(lambda x: min(x,1))
+    total_sum = train_df[columns_base].apply(sum, axis=1)
+    train_df[columns_percentage] = train_df[columns_base].div(total_sum,axis=0)
+
+    return train_df.values
+
 
 def getindices(trainingdata, train_split=9, test_split=1):
     ### Creating 50-50% balance
