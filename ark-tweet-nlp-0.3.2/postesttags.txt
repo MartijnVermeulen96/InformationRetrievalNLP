@@ -1,0 +1,36 @@
+RunTagger [options] [ExamplesFilename]
+  runs the CMU ARK Twitter tagger on tweets from ExamplesFilename, 
+  writing taggings to standard output. Listens on stdin if no input filename.
+
+Options:
+  --model <Filename>        Specify model filename. (Else use built-in.)
+  --just-tokenize           Only run the tokenizer; no POS tags.
+  --quiet                   Quiet: no output
+  --input-format <Format>   Default: auto
+                            Options: json, text, conll
+  --output-format <Format>  Default: automatically decide from input format.
+                            Options: pretsv, conll
+  --input-field NUM         Default: 1
+                            Which tab-separated field contains the input
+                            (1-indexed, like unix 'cut')
+                            Only for {json, text} input formats.
+  --word-clusters <File>    Alternate word clusters file (see FeatureExtractor)
+  --no-confidence           Don't output confidence probabilities
+  --decoder <Decoder>       Change the decoding algorithm (default: greedy)
+
+Tweet-per-line input formats:
+   json: Every input line has a JSON object containing the tweet,
+         as per the Streaming API. (The 'text' field is used.)
+   text: Every input line has the text for one tweet.
+We actually assume input lines are TSV and the tweet data is one field.
+(Therefore tab characters are not allowed in tweets.
+Twitter's own JSON formats guarantee this;
+if you extract the text yourself, you must remove tabs and newlines.)
+Tweet-per-line output format is
+   pretsv: Prepend the tokenization and tagging as new TSV fields, 
+           so the output includes a complete copy of the input.
+By default, three TSV fields are prepended:
+   Tokenization \t POSTags \t Confidences \t (original data...)
+The tokenization and tags are parallel space-separated lists.
+The 'conll' format is token-per-line, blank spaces separating tweets.
+
